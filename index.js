@@ -15,7 +15,8 @@ bot.on(Events.VoiceStateUpdate, (oldState, newState) => {
     const oldCh = oldState.channel;
     const newCh = newState.channel;
 
-    const logChannel = oldState.guild.channels.cache.find(c => c.name === "log-voice");
+    const logChannel = oldState.guild.channels.cache.find(
+        c => c.name === "ทดสอบ-samabot" || c.name === "ห้องแจ้งเตือนเข้าออกห้องพูดคุย" );
     if (!logChannel) return;
 
     if (!oldCh && newCh) {
