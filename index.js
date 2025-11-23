@@ -14,21 +14,18 @@ bot.on('ready', () => {
 bot.on(Events.VoiceStateUpdate, (oldState, newState) => {
     const oldCh = oldState.channel;
     const newCh = newState.channel;
-
     const logChannel = oldState.guild.channels.cache.find(
         c => c.name === "ทดสอบ-samabot" || c.name === "ห้องแจ้งเตือนเข้าออกห้องพูดคุย" );
+
     if (!logChannel) return;
-
     if (!oldCh && newCh) {
-        logChannel.send(`**${newState.member.user.username}** เข้าห้องเสียง **\n${newCh.name}**`);
+        logChannel.send(`**[${newState.member.user.username}]** เข้าห้องเสียง **\n${newCh.name}**`);
     }
-
     if (oldCh && !newCh) {
-        logChannel.send(`**${oldState.member.user.username}** ออกจากห้องเสียง **\n${oldCh.name}**`);
+        logChannel.send(`**[${oldState.member.user.username}]** ออกจากห้องเสียง **\n${oldCh.name}**`);
     }
-
     if (oldCh && newCh && oldCh.id !== newCh.id) {
-        logChannel.send(`**${newState.member.user.username}\n** ย้ายจาก **${oldCh.name}\n** ไป **${newCh.name}**`);
+        logChannel.send(`**[${newState.member.user.username}]** ย้ายจาก **\n${oldCh.name}** ไป **\n${newCh.name}**`);
     }
 });
 
