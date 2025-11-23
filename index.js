@@ -20,15 +20,15 @@ bot.on(Events.VoiceStateUpdate, (oldState, newState) => {
     if (!logChannel) return;
 
     if (!oldCh && newCh) {
-        logChannel.send(`🔊 **${newState.member.user.username}** เข้าห้องเสียง **${newCh.name}**`);
+        logChannel.send(`**${newState.member.user.username}** เข้าห้องเสียง **\n${newCh.name}**`);
     }
 
     if (oldCh && !newCh) {
-        logChannel.send(`🔇 **${oldState.member.user.username}** ออกจากห้องเสียง **${oldCh.name}**`);
+        logChannel.send(`**${oldState.member.user.username}** ออกจากห้องเสียง **\n${oldCh.name}**`);
     }
 
     if (oldCh && newCh && oldCh.id !== newCh.id) {
-        logChannel.send(`➡️ **${newState.member.user.username}** ย้ายจาก **${oldCh.name}** ไป **${newCh.name}**`);
+        logChannel.send(`**${newState.member.user.username}\n** ย้ายจาก **${oldCh.name}\n** ไป **${newCh.name}**`);
     }
 });
 
