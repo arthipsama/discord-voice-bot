@@ -29,7 +29,7 @@ bot.on(Events.VoiceStateUpdate, (oldState, newState) => {
     if (oldCh && newCh && oldCh.id !== newCh.id) {
         logChannel.send(`**------------------------------------------------**`);
         logChannel.send(`**[${newState.member.user.username}]** ย้ายห้องจาก **\n${oldCh.name}** ไป **
-            \n** ⬇️⬇️⬇️ **\n${newCh.name}**`);
+        ** ------- ⬇️⬇️⬇️ ------- **\n${newCh.name}**`);
     }
 });
 
