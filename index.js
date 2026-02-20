@@ -31,7 +31,8 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
                 `\n⏰ เวลา: ${timeNow}
                 ━━━━━━━━━━━━━━━━━━
                 👤 ผู้ใช้: ${newState.member}
-                📌 การกระทำ: เข้าห้อง
+                📌 ทำการเข้าห้อง
+
                 📍 ห้อง: ${newCh.name}`
             ).setTimestamp();
             return logChannel.send({ embeds: [embed] });
@@ -43,7 +44,8 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
                 `\n⏰ เวลา: ${timeNow}
                 ━━━━━━━━━━━━━━━━━━
                 👤 ผู้ใช้: ${oldState.member}
-                📌 การกระทำ: ออกจากห้อง
+                📌 ทำการออกจากห้อง
+
                 📍 ห้อง: ${oldCh.name}`
             ).setTimestamp();
             return logChannel.send({ embeds: [embed] });
@@ -55,15 +57,13 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
             // ====== เพิ่มเวลาการรอให้ Discord บันทึก Audit Log ลงระบบให้เสร็จก่อน ======
             await new Promise(r => setTimeout(r, 500)); 
             const fetchedLogs = await oldState.guild.fetchAuditLogs({
-                type: AuditLogEvent.MemberMove,
-                limit: 5
+                type: AuditLogEvent.MemberMove
             });
 
             const nowTs = Date.now();
             const moveLog = fetchedLogs.entries.find(entry => {
                 const isRecent = (nowTs - entry.createdTimestamp) < 2000;
                 const isSameChannel = entry.extra?.channel?.id === newCh.id;
-
                 return isRecent && isSameChannel;
             });
 
@@ -82,7 +82,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
                     `\n⏰ เวลา: ${timeNow}
                     ━━━━━━━━━━━━━━━━━━
                     👤 ผู้ใช้: ${member}
-                    📌 การกระทำ: ${actionLine}
+                    📌 ${actionLine}
 
                     📤 จาก: ${oldCh.name}
                     📥 ไปยัง: ${newCh.name}`
