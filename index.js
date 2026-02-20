@@ -27,13 +27,25 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     // ====== เข้า Voice ======
     if (!oldCh && newCh) {
         const embed = new EmbedBuilder().setColor(0x2ECC71).setTitle("🔊 เข้าใช้งาน Voice")
-            .setDescription(`\n⏰ เวลา: ${timeNow}━━━━━━━━━━━━━━━━━━👤 ผู้ใช้: ${newState.member}📌 การกระทำ: เข้าห้อง📍 ห้อง: ${newCh.name}`).setTimestamp();
+            .setDescription(
+                `\n⏰ เวลา: ${timeNow}
+                ━━━━━━━━━━━━━━━━━━
+                👤 ผู้ใช้: ${newState.member}
+                📌 การกระทำ: เข้าห้อง
+                📍 ห้อง: ${newCh.name}`
+            ).setTimestamp();
             return logChannel.send({ embeds: [embed] });
     }
     // ====== ออก Voice ======
     if (oldCh && !newCh) {
         const embed = new EmbedBuilder().setColor(0xE74C3C).setTitle("🔊 ออกจาก Voice")
-            .setDescription(`\n⏰ เวลา: ${timeNow}━━━━━━━━━━━━━━━━━━👤 ผู้ใช้: ${oldState.member}📌 การกระทำ: ออกจากห้อง📍 ห้อง: ${oldCh.name}`).setTimestamp();
+            .setDescription(
+                `\n⏰ เวลา: ${timeNow}
+                ━━━━━━━━━━━━━━━━━━
+                👤 ผู้ใช้: ${oldState.member}
+                📌 การกระทำ: ออกจากห้อง
+                📍 ห้อง: ${oldCh.name}`
+            ).setTimestamp();
             return logChannel.send({ embeds: [embed] });
     }
     // ====== ย้ายห้อง ======
@@ -63,27 +75,19 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
             }
             // ====== แสดงผลเวลาย้ายผู้ใช้ , ย้ายห้องไปมาเอง ======
             const member = newState.member;
-
-            const actionLine =
-                movedBy && movedBy.id !== member.id
-                    ? `${member} ถูกย้ายโดย ${movedBy}`
-                    : ` ย้ายห้องเอง`;
-
+            const actionLine = movedBy && movedBy.id !== member.id? `${member} ถูกย้ายโดย ${movedBy}`: ` ย้ายห้องเอง`;
             const embed = new EmbedBuilder()
-                .setColor(movedBy ? 0xF39C12 : 0x3498DB)
-                .setTitle("🔊 ย้ายห้อง Voice")
+                .setColor(movedBy ? 0xF39C12 : 0x3498DB).setTitle("🔊 ย้ายห้อง Voice")
                 .setDescription(
-            `\n⏰ เวลา: ${timeNow}
-            ━━━━━━━━━━━━━━━━━━
-            👤 ผู้ใช้: ${member}
-            📌 การกระทำ: ${actionLine}
+                    `\n⏰ เวลา: ${timeNow}
+                    ━━━━━━━━━━━━━━━━━━
+                    👤 ผู้ใช้: ${member}
+                    📌 การกระทำ: ${actionLine}
 
-            📤 จาก: ${oldCh.name}
-            📥 ไปยัง: ${newCh.name}`
-                )
-                .setTimestamp();
-
-            logChannel.send({ embeds: [embed] });
+                    📤 จาก: ${oldCh.name}
+                    📥 ไปยัง: ${newCh.name}`
+                ).setTimestamp();
+                logChannel.send({ embeds: [embed] });
     }
 });
 
