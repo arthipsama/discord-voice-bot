@@ -84,7 +84,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         } else {
             logChannel.send(`**[${newState.member.user.username}] ได้เข้ามาเอง**`);
         }
-        logChannel.send(` ย้ายออกจากห้อง **\n${oldCh.name}\n** ------- ⬇️⬇️⬇️ ------- **\n${newCh.name}**`);
+        logChannel.send(` **[${newState.member.user.username}] ** ย้ายออกจากห้อง **\n${oldCh.name}\n** ------- ⬇️⬇️⬇️ ------- **\n${newCh.name}**`);
     }
 });
 
