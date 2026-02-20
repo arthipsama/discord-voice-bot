@@ -28,8 +28,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     if (!oldCh && newCh) {
         const embed = new EmbedBuilder().setColor(0x2ECC71).setTitle("🔊 เข้าใช้งาน Voice")
             .setDescription(
-                `\n⏰ เวลา: ${timeNow}
-                ━━━━━━━━━━━━━━━━━━
+                `━━━━━━━━━━━━━━━━━━
                 👤 ผู้ใช้: ${newState.member}
                 📌 ทำการเข้าห้อง
 
@@ -39,15 +38,29 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     }
     // ====== ออก Voice ======
     if (oldCh && !newCh) {
-        const embed = new EmbedBuilder().setColor(0xE74C3C).setTitle("🔊 ออกจาก Voice")
-            .setDescription(
-                `\n⏰ เวลา: ${timeNow}
-                ━━━━━━━━━━━━━━━━━━
-                👤 ผู้ใช้: ${oldState.member}
-                📌 ทำการออกจากห้อง
+        let kickedBy = null;
+        try {
+            await new Promise(r => setTimeout(r, 500));
+            const logs = await oldState.guild.fetchAuditLogs({
+                type: AuditLogEvent.MemberDisconnect
+            });
+            const nowTs = Date.now();
+            const entry = logs.entries.find(e =>(nowTs - e.createdTimestamp) < 2000 && e.target?.id === oldState.id);
 
-                📍 ห้อง: ${oldCh.name}`
-            ).setTimestamp();
+            if (entry) kickedBy = entry.executor;
+            } catch (err) {
+                console.log("Disconnect audit error:", err);
+            }
+            const member = oldState.member;
+            const actionLine = kickedBy && kickedBy.id !== member.id ? `${member} ถูกเตะโดย ${kickedBy}` : `${member} ออกจากห้องเอง`;
+            const embed = new EmbedBuilder().setColor(kickedBy ? 0xC0392B : 0xE74C3C).setTitle("🔊 ออกจาก Voice")
+                .setDescription(
+                    `━━━━━━━━━━━━━━━━━━
+                    👤 ผู้ใช้: ${member}
+                    📌 ${actionLine}
+
+                    📍 ห้อง: ${oldCh.name}`
+                    ).setTimestamp();
             return logChannel.send({ embeds: [embed] });
     }
     // ====== ย้ายห้อง ======
@@ -79,8 +92,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
             const embed = new EmbedBuilder()
                 .setColor(movedBy ? 0xF39C12 : 0x3498DB).setTitle("🔊 ย้ายห้อง Voice")
                 .setDescription(
-                    `\n⏰ เวลา: ${timeNow}
-                    ━━━━━━━━━━━━━━━━━━
+                    `━━━━━━━━━━━━━━━━━━
                     👤 ผู้ใช้: ${member}
                     📌 ${actionLine}
 
