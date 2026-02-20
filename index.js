@@ -15,11 +15,6 @@ bot.on('ready', () => {
 bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     const oldCh = oldState.channel;
     const newCh = newState.channel;
-    const now = new Date(Date.now() + 7 * 60 * 60 * 1000);
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const timeNow = `${hours}:${minutes}:${seconds}`;
     const logChannel = oldState.guild.channels.cache.find(c => c.name === "ทดสอบ-samabot" || c.name === "ห้องแจ้งเตือนเข้าออกห้องพูดคุย" );
 
     if (!logChannel) 
@@ -39,7 +34,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     // ====== ออก Voice ======
     if (oldCh && !newCh) {
         let actionText = "ออกจากห้องเอง";
-        
+
         try {
             await new Promise(r => setTimeout(r, 1000));
 
