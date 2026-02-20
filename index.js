@@ -25,90 +25,65 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     if (!logChannel) 
         return;
     // ====== เข้า Voice ======
-if (!oldCh && newCh) {
-
-    const embed = new EmbedBuilder()
-        .setColor(0x2ECC71) // เขียว
-        .setTitle("🔊 เข้าใช้งาน Voice")
-        .setDescription(
-`\n⏰ เวลา: ${timeNow}
-━━━━━━━━━━━━━━━━━━
-👤 ผู้ใช้: ${newState.member}
-📌 การกระทำ: เข้าห้อง
-
-📍 ห้อง: ${newCh.name}`
-        )
-        .setTimestamp();
-
-    return logChannel.send({ embeds: [embed] });
-}
+    if (!oldCh && newCh) {
+        const embed = new EmbedBuilder().setColor(0x2ECC71).setTitle("🔊 เข้าใช้งาน Voice")
+            .setDescription(`\n⏰ เวลา: ${timeNow}━━━━━━━━━━━━━━━━━━👤 ผู้ใช้: ${newState.member}📌 การกระทำ: เข้าห้อง📍 ห้อง: ${newCh.name}`).setTimestamp();
+            return logChannel.send({ embeds: [embed] });
+    }
     // ====== ออก Voice ======
-if (oldCh && !newCh) {
-
-    const embed = new EmbedBuilder()
-        .setColor(0xE74C3C) // แดง
-        .setTitle("🔊 ออกจาก Voice")
-        .setDescription(
-`\n⏰ เวลา: ${timeNow}
-━━━━━━━━━━━━━━━━━━
-👤 ผู้ใช้: ${oldState.member}
-📌 การกระทำ: ออกจากห้อง
-
-📍 ห้อง: ${oldCh.name}`
-        )
-        .setTimestamp();
-
-    return logChannel.send({ embeds: [embed] });
-}
+    if (oldCh && !newCh) {
+        const embed = new EmbedBuilder().setColor(0xE74C3C).setTitle("🔊 ออกจาก Voice")
+            .setDescription(`\n⏰ เวลา: ${timeNow}━━━━━━━━━━━━━━━━━━👤 ผู้ใช้: ${oldState.member}📌 การกระทำ: ออกจากห้อง📍 ห้อง: ${oldCh.name}`).setTimestamp();
+            return logChannel.send({ embeds: [embed] });
+    }
     // ====== ย้ายห้อง ======
     if (oldCh && newCh && oldCh.id !== newCh.id) {
         let movedBy = null;
         try {
-        // เพิ่มเวลาการรอให้ Discord บันทึก Audit Log ลงระบบให้เสร็จก่อน
-        await new Promise(r => setTimeout(r, 500)); 
-        const fetchedLogs = await oldState.guild.fetchAuditLogs({
-            type: AuditLogEvent.MemberMove,
-            limit: 5
-        });
+            // ====== เพิ่มเวลาการรอให้ Discord บันทึก Audit Log ลงระบบให้เสร็จก่อน ======
+            await new Promise(r => setTimeout(r, 500)); 
+            const fetchedLogs = await oldState.guild.fetchAuditLogs({
+                type: AuditLogEvent.MemberMove,
+                limit: 5
+            });
 
-        // เปลี่ยนชื่อตัวแปรเป็น currentTime เพื่อไม่ให้ซ้ำกับ now ด้านบน
-        const nowTs = Date.now();
-        const moveLog = fetchedLogs.entries.find(entry => {
-            const isRecent = (nowTs - entry.createdTimestamp) < 2000;
-            const isSameChannel = entry.extra?.channel?.id === newCh.id;
+            const nowTs = Date.now();
+            const moveLog = fetchedLogs.entries.find(entry => {
+                const isRecent = (nowTs - entry.createdTimestamp) < 2000;
+                const isSameChannel = entry.extra?.channel?.id === newCh.id;
 
-            return isRecent && isSameChannel;
-        });
+                return isRecent && isSameChannel;
+            });
 
-        if (moveLog) {
-            movedBy = moveLog.executor;
-        }
-        } catch (err) {
-            console.log('Audit log error:', err);
-        }
-        // แสดงผล
-        const member = newState.member;
+            if (moveLog) {
+                movedBy = moveLog.executor;
+            }
+            } catch (err) {
+                console.log('Audit log error:', err);
+            }
+            // ====== แสดงผลเวลาย้ายผู้ใช้ , ย้ายห้องไปมาเอง ======
+            const member = newState.member;
 
-        const actionLine =
-            movedBy && movedBy.id !== member.id
-                ? `${member} ถูกย้ายโดย ${movedBy}`
-                : `${member} ย้ายห้องเอง`;
+            const actionLine =
+                movedBy && movedBy.id !== member.id
+                    ? `${member} ถูกย้ายโดย ${movedBy}`
+                    : ` ย้ายห้องเอง`;
 
-        const embed = new EmbedBuilder()
-            .setColor(movedBy ? 0xF39C12 : 0x3498DB)
-            .setTitle("🔊 ย้ายห้อง Voice")
-            .setDescription(
-        `\n⏰ เวลา: ${timeNow}
-        ━━━━━━━━━━━━━━━━━━
-        👤 ผู้ใช้: ${member}
-        📌 การกระทำ: ${actionLine}
+            const embed = new EmbedBuilder()
+                .setColor(movedBy ? 0xF39C12 : 0x3498DB)
+                .setTitle("🔊 ย้ายห้อง Voice")
+                .setDescription(
+            `\n⏰ เวลา: ${timeNow}
+            ━━━━━━━━━━━━━━━━━━
+            👤 ผู้ใช้: ${member}
+            📌 การกระทำ: ${actionLine}
 
-        📤 จาก: ${oldCh.name}
-        📥 ไปยัง: ${newCh.name}`
-            )
-            .setTimestamp();
+            📤 จาก: ${oldCh.name}
+            📥 ไปยัง: ${newCh.name}`
+                )
+                .setTimestamp();
 
-        logChannel.send({ embeds: [embed] });
+            logChannel.send({ embeds: [embed] });
     }
 });
 
