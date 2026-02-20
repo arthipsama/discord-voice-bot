@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Events, AuditLogEvent } = require('discord.js');
+const {Client, GatewayIntentBits, Events, AuditLogEvent, EmbedBuilder} = require('discord.js');
 
 const bot = new Client({
     intents: [
@@ -41,29 +41,16 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         let movedBy = null;
         try {
         // เพิ่มเวลาการรอให้ Discord บันทึก Audit Log ลงระบบให้เสร็จก่อน
-        await new Promise(r => setTimeout(r, 1000)); 
-
+        await new Promise(r => setTimeout(r, 500)); 
         const fetchedLogs = await oldState.guild.fetchAuditLogs({
             type: AuditLogEvent.MemberMove,
             limit: 5
         });
 
-        console.log("===== DEBUG AUDIT LOG =====");
-        fetchedLogs.entries.forEach(entry => {
-            console.log({
-                executor: entry.executor?.username,
-                target: entry.target?.username,
-                channel: entry.extra?.channel?.name,
-                created: new Date(entry.createdTimestamp)
-            });
-        });
-        console.log("===== END DEBUG =====");
-            
         // เปลี่ยนชื่อตัวแปรเป็น currentTime เพื่อไม่ให้ซ้ำกับ now ด้านบน
         const nowTs = Date.now();
         const moveLog = fetchedLogs.entries.find(entry => {
-
-            const isRecent = (nowTs - entry.createdTimestamp) < 7000;
+            const isRecent = (nowTs - entry.createdTimestamp) < 2000;
             const isSameChannel = entry.extra?.channel?.id === newCh.id;
 
             return isRecent && isSameChannel;
@@ -75,16 +62,23 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         } catch (err) {
             console.log('Audit log error:', err);
         }
-        logChannel.send(`**-----------------------------------------**`);
-        logChannel.send(`**[⌚ เวลา : ${timeNow}] **`);
-    
-        // เช็คว่ามีคนย้าย และคนที่ย้ายไม่ใช่ตัวเอง
-        if (movedBy && movedBy.id !== newState.id) {
-            logChannel.send(`**[${movedBy.username}] ได้ทำการย้าย**`);
-        } else {
-            logChannel.send(`**[${newState.member.user.username}] ได้เข้ามาเอง**`);
-        }
-        logChannel.send(` **[${newState.member.user.username}] ** ย้ายออกจากห้อง **\n${oldCh.name}\n** ------- ⬇️⬇️⬇️ ------- **\n${newCh.name}**`);
+        // แสดงผล
+        const member = newState.member;
+        const actionLine = movedBy && movedBy.id !== member.id ? `${member} ถูกย้ายโดย ${movedBy}` : `${member} ย้ายห้องเอง`;
+        const embed = new EmbedBuilder()
+            .setColor(0x5865F2)
+            .setTitle("📢 Voice Activity")
+            .addFields(
+                { name: "⏰ เวลา", value: timeNow, inline: true },
+                { name: "👤 ผู้ใช้", value: `${member}`, inline: true },
+                { name: "📌 การกระทำ", value: actionLine }
+            )
+            .addFields(
+                { name: "จาก", value: oldCh.name, inline: true },
+                { name: "ไปยัง", value: newCh.name, inline: true }
+            )
+            .setTimestamp();
+        logChannel.send({ embeds: [embed] });
     }
 });
 
