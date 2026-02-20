@@ -31,7 +31,8 @@ if (!oldCh && newCh) {
         .setColor(0x2ECC71) // เขียว
         .setTitle("🔊 เข้าใช้งาน Voice")
         .setDescription(
-`⏰ เวลา: ${timeNow}
+`\n⏰ เวลา: ${timeNow}
+━━━━━━━━━━━━━━━━━━
 👤 ผู้ใช้: ${newState.member}
 📌 การกระทำ: เข้าห้อง
 
@@ -48,7 +49,8 @@ if (oldCh && !newCh) {
         .setColor(0xE74C3C) // แดง
         .setTitle("🔊 ออกจาก Voice")
         .setDescription(
-`⏰ เวลา: ${timeNow}
+`\n⏰ เวลา: ${timeNow}
+━━━━━━━━━━━━━━━━━━
 👤 ผู้ใช้: ${oldState.member}
 📌 การกระทำ: ออกจากห้อง
 
@@ -96,7 +98,8 @@ if (oldCh && !newCh) {
             .setColor(movedBy ? 0xF39C12 : 0x3498DB)
             .setTitle("🔊 ย้ายห้อง Voice")
             .setDescription(
-        `⏰ เวลา: ${timeNow}
+        `\n⏰ เวลา: ${timeNow}
+        ━━━━━━━━━━━━━━━━━━
         👤 ผู้ใช้: ${member}
         📌 การกระทำ: ${actionLine}
 
