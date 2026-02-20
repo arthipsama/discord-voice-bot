@@ -47,6 +47,18 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
                 type: AuditLogEvent.MemberMove,
                 limit: 5
             });
+
+            console.log("===== DEBUG AUDIT LOG =====");
+            fetchedLogs.entries.forEach(entry => {
+                console.log({
+                    executor: entry.executor?.username,
+                    target: entry.target?.username,
+                    channel: entry.extra?.channel?.name,
+                    created: new Date(entry.createdTimestamp)
+                });
+            });
+
+            console.log("===== END DEBUG =====");
             
             // เปลี่ยนชื่อตัวแปรเป็น currentTime เพื่อไม่ให้ซ้ำกับ now ด้านบน
             const currentTime = Date.now(); 
