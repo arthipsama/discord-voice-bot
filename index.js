@@ -40,26 +40,37 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     if (oldCh && newCh && oldCh.id !== newCh.id) {
         let movedBy = null;
         try {
-            await new Promise(r => setTimeout(r, 500));
+            // เพิ่มเวลาการรอให้ Discord บันทึก Audit Log ลงระบบให้เสร็จก่อน
+            await new Promise(r => setTimeout(r, 1500)); 
+
             const fetchedLogs = await oldState.guild.fetchAuditLogs({
                 type: AuditLogEvent.MemberMove,
                 limit: 5
             });
-            const now = Date.now();
+            
+            // เปลี่ยนชื่อตัวแปรเป็น currentTime เพื่อไม่ให้ซ้ำกับ now ด้านบน
+            const currentTime = Date.now(); 
+            
             const moveLog = fetchedLogs.entries.find(entry => {
-            const isTarget = entry.target.id === newState.id;
-            const isRecent = (now - entry.createdTimestamp) < 5000;
-            const isSameChannel = entry.extra?.channel?.id === newCh.id;
+                // ป้องกัน Error กรณีที่ entry.target เป็น null
+                const isTarget = entry.target?.id === newState.id;
+                const isRecent = (currentTime - entry.createdTimestamp) < 5000;
+                const isSameChannel = entry.extra?.channel?.id === newCh.id;
+                
                 return isTarget && isRecent && isSameChannel;
             });
+
             if (moveLog) {
                 movedBy = moveLog.executor;
             }
-            } catch (err) {
-                console.log('Audit log error:', err);
-            }
+        } catch (err) {
+            console.log('Audit log error:', err);
+        }
+
         logChannel.send(`**-----------------------------------------**`);
         logChannel.send(`**[⌚ เวลา : ${timeNow}] **`);
+        
+        // เช็คว่ามีคนย้าย และคนที่ย้ายไม่ใช่ตัวเอง
         if (movedBy && movedBy.id !== newState.id) {
             logChannel.send(`**[${movedBy.username}] ได้ทำการย้าย**`);
         } else {
