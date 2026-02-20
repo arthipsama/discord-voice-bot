@@ -40,48 +40,44 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     if (oldCh && newCh && oldCh.id !== newCh.id) {
         let movedBy = null;
         try {
-            // เพิ่มเวลาการรอให้ Discord บันทึก Audit Log ลงระบบให้เสร็จก่อน
-            await new Promise(r => setTimeout(r, 1500)); 
+        // เพิ่มเวลาการรอให้ Discord บันทึก Audit Log ลงระบบให้เสร็จก่อน
+        await new Promise(r => setTimeout(r, 1000)); 
 
-            const fetchedLogs = await oldState.guild.fetchAuditLogs({
-                type: AuditLogEvent.MemberMove,
-                limit: 5
+        const fetchedLogs = await oldState.guild.fetchAuditLogs({
+            type: AuditLogEvent.MemberMove,
+            limit: 5
+        });
+
+        console.log("===== DEBUG AUDIT LOG =====");
+        fetchedLogs.entries.forEach(entry => {
+            console.log({
+                executor: entry.executor?.username,
+                target: entry.target?.username,
+                channel: entry.extra?.channel?.name,
+                created: new Date(entry.createdTimestamp)
             });
-
-            console.log("===== DEBUG AUDIT LOG =====");
-            fetchedLogs.entries.forEach(entry => {
-                console.log({
-                    executor: entry.executor?.username,
-                    target: entry.target?.username,
-                    channel: entry.extra?.channel?.name,
-                    created: new Date(entry.createdTimestamp)
-                });
-            });
-
-            console.log("===== END DEBUG =====");
+        });
+        console.log("===== END DEBUG =====");
             
-            // เปลี่ยนชื่อตัวแปรเป็น currentTime เพื่อไม่ให้ซ้ำกับ now ด้านบน
-            const currentTime = Date.now(); 
-            
-            const moveLog = fetchedLogs.entries.find(entry => {
-                // ป้องกัน Error กรณีที่ entry.target เป็น null
-                const isTarget = entry.target?.id === newState.id;
-                const isRecent = (currentTime - entry.createdTimestamp) < 5000;
-                const isSameChannel = entry.extra?.channel?.id === newCh.id;
-                
-                return isTarget && isRecent && isSameChannel;
-            });
+        // เปลี่ยนชื่อตัวแปรเป็น currentTime เพื่อไม่ให้ซ้ำกับ now ด้านบน
+        const nowTs = Date.now();
+        const moveLog = fetchedLogs.entries.find(entry => {
 
-            if (moveLog) {
-                movedBy = moveLog.executor;
-            }
+            const isRecent = (nowTs - entry.createdTimestamp) < 7000;
+            const isSameChannel = entry.extra?.channel?.id === newCh.id;
+
+            return isRecent && isSameChannel;
+        });
+
+        if (moveLog) {
+            movedBy = moveLog.executor;
+        }
         } catch (err) {
             console.log('Audit log error:', err);
         }
-
         logChannel.send(`**-----------------------------------------**`);
         logChannel.send(`**[⌚ เวลา : ${timeNow}] **`);
-        
+    
         // เช็คว่ามีคนย้าย และคนที่ย้ายไม่ใช่ตัวเอง
         if (movedBy && movedBy.id !== newState.id) {
             logChannel.send(`**[${movedBy.username}] ได้ทำการย้าย**`);
