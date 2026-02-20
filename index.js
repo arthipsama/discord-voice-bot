@@ -38,26 +38,40 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     }
     // ====== ออก Voice ======
     if (oldCh && !newCh) {
-        let kickedBy = null;
+        let actionText = "ออกจากห้องเอง";
+        
         try {
-            await new Promise(r => setTimeout(r, 500));
-            const logs = await oldState.guild.fetchAuditLogs({
-                type: AuditLogEvent.MemberDisconnect
-            });
-            const nowTs = Date.now();
-            const entry = logs.entries.find(e =>(nowTs - e.createdTimestamp) < 2000 && e.target?.id === oldState.id);
+            await new Promise(r => setTimeout(r, 1000));
 
-            if (entry) kickedBy = entry.executor;
-            } catch (err) {
-                console.log("Disconnect audit error:", err);
+            const logs = await oldState.guild.fetchAuditLogs({ limit: 5 });
+            const nowTs = Date.now();
+            const recentLog = logs.entries.find(e =>(nowTs - e.createdTimestamp) < 5000);
+
+            if (recentLog) {
+                // ตัดการเชื่อมต่อ
+                if (recentLog.action === AuditLogEvent.MemberDisconnect) {
+                    actionText = `ถูกตัดการเชื่อมต่อโดย ${recentLog.executor}`;
+                    color = 0xC0392B;
+                }
+                // เตะออกเซิฟเวอร์
+                if (recentLog.action === AuditLogEvent.MemberKick) {
+                    actionText = `ถูกเตะออกจากเซิร์ฟเวอร์โดย ${recentLog.executor}`;
+                    color = 0x8E44AD;
+                }
+                // แบนออกเซิฟเวอร์
+                if (recentLog.action === AuditLogEvent.MemberBanAdd) {
+                    actionText = `ถูกแบนโดย ${recentLog.executor}`;
+                    color = 0x000000;
+                }
             }
-            const member = oldState.member;
-            const actionLine = kickedBy && kickedBy.id !== member.id ? `${member} ถูกเตะโดย ${kickedBy}` : `${member} ออกจากห้องเอง`;
-            const embed = new EmbedBuilder().setColor(kickedBy ? 0xC0392B : 0xE74C3C).setTitle("🔊 ออกจาก Voice")
+            } catch (err) {
+                console.log("Audit error:", err);
+            }
+            const embed = new EmbedBuilder().setColor(0xE74C3C).setTitle("🔊 ออกจาก Voice")
                 .setDescription(
                     `━━━━━━━━━━━━━━━━━━
-                    👤 ผู้ใช้: ${member}
-                    📌 ${actionLine}
+                    👤 ผู้ใช้: ${oldState.member}
+                    📌 ${actionText}
 
                     📍 ห้อง: ${oldCh.name}`
                     ).setTimestamp();
