@@ -40,18 +40,23 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     if (oldCh && newCh && oldCh.id !== newCh.id) {
         let movedBy = null;
         try {
-            await new Promise(r => setTimeout(r, 800));
+            await new Promise(r => setTimeout(r, 1000));
             const fetchedLogs = await oldState.guild.fetchAuditLogs({
-                limit: 1,
-                type: AuditLogEvent.MemberMove
+                type: AuditLogEvent.MemberMove,
+                limit: 5
             });
-            const moveLog = fetchedLogs.entries.first();
-            // เช็คว่า log ตรงกับคนที่ถูกย้ายไหม
-            if (moveLog && moveLog.target.id === newState.id) {
+            const now = Date.now();
+            const moveLog = fetchedLogs.entries.find(entry => {
+            const isTarget = entry.target.id === newState.id;
+            const isRecent = (now - entry.createdTimestamp) < 5000;
+                return isTarget && isRecent;
+            });
+            if (moveLog) {
                 movedBy = moveLog.executor;
-            } } catch (err) {
-            console.log('Audit log error:', err);
-        }
+            }
+            } catch (err) {
+                console.log('Audit log error:', err);
+            }
         logChannel.send(`**-----------------------------------------**`);
         logChannel.send(`**[⌚ เวลา : ${timeNow}] **`);
         if (movedBy && movedBy.id !== newState.id) {
