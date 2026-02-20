@@ -40,7 +40,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
     if (oldCh && newCh && oldCh.id !== newCh.id) {
         let movedBy = null;
         try {
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r, 500));
             const fetchedLogs = await oldState.guild.fetchAuditLogs({
                 type: AuditLogEvent.MemberMove,
                 limit: 5
