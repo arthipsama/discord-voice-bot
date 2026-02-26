@@ -77,14 +77,14 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         let movedBy = null;
         try {
             // ====== เพิ่มเวลาการรอให้ Discord บันทึก Audit Log ลงระบบให้เสร็จก่อน ======
-            await new Promise(r => setTimeout(r, 2500)); 
+            await new Promise(r => setTimeout(r, 1500)); 
             const fetchedLogs = await oldState.guild.fetchAuditLogs({
                 type: AuditLogEvent.MemberMove
             });
 
             const nowTs = Date.now();
             const moveLog = fetchedLogs.entries.find(entry => {
-                const isRecent = (nowTs - entry.createdTimestamp) < 7500;
+                const isRecent = (nowTs - entry.createdTimestamp) < 10000;
                 const isSameChannel = entry.extra?.channel?.id === newCh.id;
                 return isRecent && isSameChannel;
             });
