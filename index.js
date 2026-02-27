@@ -31,7 +31,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
 
                 📍 ห้อง: ${newCh.name}`
                 ).setTimestamp();
-            logChannel.send({ embeds: [embed] });}, 400);
+            logChannel.send({ embeds: [embed] });}, 2000);
     }
     // ====== ออก Voice ======
     if (oldCh && !newCh) {
