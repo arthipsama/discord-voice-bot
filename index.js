@@ -36,7 +36,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         let actionText = "ออกจากห้องเอง";
 
         try {
-            await new Promise(r => setTimeout(r, 1200));
+            await new Promise(r => setTimeout(r, 2000));
 
             const logs = await oldState.guild.fetchAuditLogs({ limit: 5 });
             const nowTs = Date.now();
@@ -85,7 +85,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
 
             const nowTs = Date.now();
             const moveLog = fetchedLogs.entries.find(entry => {
-                const isRecent = (nowTs - entry.createdTimestamp) < 10000;
+                const isRecent = (nowTs - entry.createdTimestamp) < 8000;
                 const isSameChannel = entry.extra?.channel?.id === newCh.id;
                 return isRecent && isSameChannel;
             });
