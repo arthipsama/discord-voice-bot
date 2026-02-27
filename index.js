@@ -86,8 +86,8 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
             const nowTs = Date.now();
             const moveLog = fetchedLogs.entries.find(entry => {
                 const isRecent = (nowTs - entry.createdTimestamp) < 8000;
-                const isTarget = e.target?.id === newState.id;
-                return isRecent && isTarget;
+                const isSameChannel = entry.extra?.channel?.id === newCh.id;
+                return isRecent && isSameChannel;
             });
 
             if (moveLog) {
