@@ -21,15 +21,17 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         return;
     // ====== เข้า Voice ======
     if (!oldCh && newCh) {
-        const embed = new EmbedBuilder().setColor(0x2ECC71).setTitle("🔊 เข้าใช้งาน Voice")
-            .setDescription(
+        setTimeout(() => {
+            // เช็คอีกครั้งว่า user ยังอยู่ใน channel นี้ไหม
+            if (newState.member.voice.channel?.id !== newCh.id) return;
+            const embed = new EmbedBuilder().setColor(0x2ECC71).setTitle("🔊 เข้าใช้งาน Voice").setDescription(
                 `━━━━━━━━━━━━━━━━━━
                 👤 ผู้ใช้: ${newState.member}
                 📌 ทำการเข้าห้อง
 
                 📍 ห้อง: ${newCh.name}`
-            ).setTimestamp();
-            return logChannel.send({ embeds: [embed] });
+                ).setTimestamp();
+            logChannel.send({ embeds: [embed] });}, 400);
     }
     // ====== ออก Voice ======
     if (oldCh && !newCh) {
@@ -80,7 +82,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
             await new Promise(r => setTimeout(r, 2000)); 
             const fetchedLogs = await oldState.guild.fetchAuditLogs({
                 type: AuditLogEvent.MemberMove,
-                limit: 3
+                limit: 5
             });
 
             const nowTs = Date.now();
