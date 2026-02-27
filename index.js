@@ -79,7 +79,8 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
             // ====== เพิ่มเวลาการรอให้ Discord บันทึก Audit Log ลงระบบให้เสร็จก่อน ======
             await new Promise(r => setTimeout(r, 2000)); 
             const fetchedLogs = await oldState.guild.fetchAuditLogs({
-                type: AuditLogEvent.MemberMove
+                type: AuditLogEvent.MemberMove,
+                limit: 3
             });
 
             const nowTs = Date.now();
@@ -97,7 +98,7 @@ bot.on(Events.VoiceStateUpdate, async (oldState, newState) => {
             }
             // ====== แสดงผลเวลาย้ายผู้ใช้ , ย้ายห้องไปมาเอง ======
             const member = newState.member;
-            const actionLine = movedBy && movedBy.id !== member.id? `${member} ถูกย้ายโดย ${movedBy}`: ` ย้ายห้องเอง`;
+            const actionLine = movedBy && movedBy.id !== member.id? `${member} ถูกย้ายโดย ${movedBy}`: ` ย้ายห้อง`;
             const embed = new EmbedBuilder()
                 .setColor(movedBy ? 0xF39C12 : 0x3498DB).setTitle("🔊 ย้ายห้อง Voice")
                 .setDescription(
